@@ -49,15 +49,39 @@ setInterval(() => issAPI(map, marker), 1000);
 ***************/
 
 //Création d'un paragraphe avec attributs demandés
-let text = document.createElement("p");
+const text = document.createElement("p");
 text.style.height = "300px";
 text.style.width = "200px";
-text.style.margin = "16px 0px 16px 0px";
+text.style.margin = "16px 0px";
 text.style.border = "3px solid grey";
 text.style.padding = "16px 12px 24px 12px";
 
-//récupération de la div souhaitée
-const wheatherCard = document.getElementsByClassName("cardMeteo");
+//récupération des élèments pour insérer notre paragraphe
+const wheatherCard = document.querySelector(".cardMeteo");
+const button = document.querySelector("button");
 
-//ajout du texte dans la div souhaitée
-wheatherCard.appendChild(text);
+//on insère le paragraphe au bon endroit
+wheatherCard.insertBefore(text, button);
+
+// fonction pour renseigner les infos dans le paragraphe
+function addInfo(element, texte) {
+    element.textContent = texte;
+}
+
+// addeventlistener pour charger les infos quand on clique sur le bouton
+button.addEventListener("click", () => {
+    fetch("https://prevision-meteo.ch/services/json/toulouse")
+        .then(response => response.json())
+        .then(data => {
+            addInfo(
+                text,
+                `Condition : ${data.current_condition.condition}
+                Température : ${data.current_condition.tmp} °C
+                Max du jour : ${data.fcst_day_0.tmax} °C
+                Min du jour : ${data.fcst_day_0.tmin} °C`
+            );
+        })
+        .catch(error => {
+            console.log("Une erreur est survenue :", error);
+        });
+});
